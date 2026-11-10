@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="d5wcBd5RNNI9gL3TqjwR">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-1" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=35;fontColor=#193247;fontFamily=Times New Roman;" value="&lt;b&gt;TONY Gestão de Obras&lt;/b&gt;" vertex="1">
+          <mxGeometry height="51" width="383" x="97" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-2" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=19;fontColor=#193247;" value="Diagrama entidade-relacionamento · SQLite · Etapa 1" vertex="1">
+          <mxGeometry height="34" width="500" x="97" y="68" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-3" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#5679bd;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding: 8px; background: rgb(226, 235, 255); text-align: center;&quot;&gt;construtoras&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK  id&lt;br&gt;nome&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="111" x="90" y="142" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-4" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#3d886a;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding:8px;background:#def4e9;text-align:center&quot;&gt;obras&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK  id&lt;br&gt;FK  construtora_id&lt;br&gt;nome · local&lt;br&gt;data_inicio · previsao_entrega&lt;br&gt;status&lt;/div&gt;" vertex="1">
+          <mxGeometry height="198" width="245" x="288" y="108.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-5" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#3d886a;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding:8px;background:#def4e9;text-align:center&quot;&gt;etapas&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK  id&lt;br&gt;FK  obra_id&lt;br&gt;nome · ordem · prazo&lt;br&gt;progresso&lt;/div&gt;" vertex="1">
+          <mxGeometry height="153" width="179" x="620" y="120.5" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-6" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#5679bd;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding:8px;background:#e2ebff;text-align:center&quot;&gt;usuarios&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK  id&lt;br&gt;nome · email&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="111" x="80" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-7" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#5679bd;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding:8px;background:#e2ebff;text-align:center&quot;&gt;participantes_obra&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK / FK  obra_id&lt;br&gt;PK / FK  usuario_id&lt;br&gt;PK  perfil&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="160" x="330.5" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-8" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#a57733;strokeWidth=1.5;fontSize=15;fontColor=#193247;" value="&lt;div style=&quot;padding:8px;background:#fff1d9;text-align:center;color:#193247&quot;&gt;&lt;b&gt;registros_diario&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45;color:#193247&quot;&gt;PK  id&lt;br&gt;FK composta  obra_id + autor_id + perfil_autor&lt;br&gt;data_registro · atividades · equipe · condicoes&lt;br&gt;proxima_atividade · status&lt;br&gt;compartilhado_com_cliente&lt;/div&gt;" vertex="1">
+          <mxGeometry height="210" width="336" x="612" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-9" parent="1" style="html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacing=0;fillColor=#ffffff;strokeColor=#a57733;strokeWidth=1.5;fontSize=15;fontColor=light-dark(#193247,#FFFFFF);fontStyle=1" value="&lt;div style=&quot;padding:8px;background:#fff1d9;text-align:center&quot;&gt;fotos_diario&lt;/div&gt;&lt;div style=&quot;padding:9px;line-height:1.45&quot;&gt;PK  id&lt;br&gt;FK  registro_id&lt;br&gt;caminho · legenda&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="150" x="705" y="596" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-10" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-11" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-12" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-13" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-14" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-7" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-15" edge="1" parent="1" source="CqxAYtKJiIRNddOSXMWu-8" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#51677d;strokeWidth=1.5;startArrow=ERone;endArrow=ERzeroToMany;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontStyle=1" target="CqxAYtKJiIRNddOSXMWu-9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CqxAYtKJiIRNddOSXMWu-16" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontColor=#193247;fontStyle=1" value="PK: chave primária · FK: chave estrangeira&lt;br&gt;Um registro de diário pertence a um vínculo de autor na mesma obra. Um vínculo pode criar zero ou mais registros." vertex="1">
+          <mxGeometry height="110" width="650" x="22" y="570" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
