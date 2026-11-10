@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "TONY Gestão de Obras - Etapa 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "CRUD local com dados fictícios. Rode bd/init_db.py --demo, informe o construtora_id exibido e copie para obra_id o ID retornado pelo POST antes de executar PUT e DELETE."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5000"
+    },
+    {
+      "key": "construtora_id",
+      "value": "1"
+    },
+    {
+      "key": "obra_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Cadastrar obra de teste",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/obras",
+        "description": "Espera 201. Copie o ID retornado para a variável obra_id.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"construtora_id\": {{construtora_id}},\n  \"nome\": \"Reforma de demonstração\",\n  \"local\": \"Cascavel, PR\",\n  \"status\": \"planejada\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "02 Listar obras",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/obras",
+        "description": "Espera 200. Confira a obra cadastrada na lista."
+      }
+    },
+    {
+      "name": "03 Editar obra de teste",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/obras/{{obra_id}}",
+        "description": "Espera 200. Use o ID retornado pelo POST.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"construtora_id\": {{construtora_id}},\n  \"nome\": \"Reforma de demonstração\",\n  \"local\": \"Cascavel, PR\",\n  \"status\": \"em_andamento\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "04 Excluir obra de teste",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/obras/{{obra_id}}",
+        "description": "Espera 200. Use apenas o ID da obra fictícia criada pelo POST. Uma segunda tentativa retorna 404."
+      }
+    }
+  ]
+}
