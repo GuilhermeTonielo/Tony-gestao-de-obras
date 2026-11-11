@@ -71,3 +71,11 @@ Crie uma coleção para o TONY e use `http://localhost:5000` como endereço base
 4. Faça o DELETE dessa obra de demonstração. Capture o status 200. Repetir a exclusão do mesmo ID deve retornar 404.
 
 Dados inválidos retornam 400. Consultar, editar ou excluir um ID inexistente retorna 404. A exclusão de obra com dados vinculados retorna 409 e preserva os registros. As datas são campos de texto opcionais. Se usá-las, prefira o formato `AAAA-MM-DD`.
+
+## Etapa 3 — Cadastro e listagem pela interface
+
+Prepare o banco com `bd/init_db.py --demo`, inicie `backend/app.py` e abra [http://127.0.0.1:5000/painel](http://127.0.0.1:5000/painel).
+
+O Flask serve a página e a API na mesma origem. A tela em `frontend/obras.html` usa as cores, os ícones e a tipografia do protótipo do Figma. O JavaScript em `frontend/assets/obras.js` faz o `POST /obras` ao enviar o formulário e o `GET /obras` ao abrir a página e depois de cada cadastro.
+
+Para as evidências da recuperação, abra **Nova obra**, preencha uma obra fictícia e capture o formulário antes do envio. Cadastre a obra e capture a confirmação e a listagem. Recarregue para verificar que a obra continua na lista. Por fim, confira a linha na tabela `obras` de `bd/tony.db` no VS Code.

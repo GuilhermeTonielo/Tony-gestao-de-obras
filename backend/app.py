@@ -1,11 +1,16 @@
 import sqlite3
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from flask_cors import cross_origin
 
 from database import DB_PATH, obter_conexao
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder="../frontend",
+    static_folder="../frontend/assets",
+    static_url_path="/painel/assets",
+)
 app.config["DB_PATH"] = DB_PATH
 
 STATUS_OBRA = ("planejada", "em_andamento", "concluida")
@@ -20,6 +25,15 @@ def status_api():
         projeto="TONY Gestão de Obras",
         mensagem="API da Etapa 1 em execução.",
     )
+
+
+@app.get("/painel")
+def painel_obras():
+    with obter_conexao(app.config["DB_PATH"]) as conexao:
+        construtoras = conexao.execute(
+            "SELECT id, nome FROM construtoras ORDER BY nome, id"
+        ).fetchall()
+    return render_template("obras.html", construtoras=construtoras)
 
 
 def ler_dados_obra():
