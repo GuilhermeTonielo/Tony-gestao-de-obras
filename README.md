@@ -1,81 +1,131 @@
 # TONY Gestão de Obras
 
-Projeto escolar de recuperação do 3º C. O TONY organiza etapas e diários de obra e prevê acessos para construtoras, mestres de obras e clientes.
-
-## Equipe
+Projeto escolar de recuperação do 3º C. O painel web permite cadastrar e listar obras. A API também permite consultar uma obra pelo ID, editar seus dados e excluí-la.
 
 - **Guilherme Tonielo** — modelagem do banco, API e testes.
 - **Mauricio Torres Queiroz** — apoio no design e na interface.
 
-## Etapa 1
-
-- `bd/tony-der.drawio`: diagrama entidade-relacionamento editável no draw.io.
-- `bd/script.sql`: definição das tabelas do SQLite.
-- `bd/init_db.py`: cria o banco local a partir do script SQL.
-- `backend/app.py`: API Flask com rota de verificação.
-- `backend/requirements.txt`: dependências da API.
-
-A primeira etapa entrega a estrutura do banco e uma rota de verificação. As telas, os cadastros funcionais e as regras de acesso serão implementados nas próximas etapas.
-
 ## Como executar no Windows
 
-Abra a pasta raiz deste projeto no VS Code. No terminal, confirme que `python --version` indica Python 3.10 ou superior. Em seguida, execute a partir da raiz:
+Na raiz do projeto, use o PowerShell com Python 3.10 ou superior.
 
 ```powershell
 python -m venv backend/venv
 .\backend\venv\Scripts\python.exe -m pip install -r backend/requirements.txt
-.\backend\venv\Scripts\python.exe bd/init_db.py
+.\backend\venv\Scripts\python.exe bd/init_db.py --demo
 .\backend\venv\Scripts\python.exe backend/app.py
 ```
 
-Abra [http://localhost:5000/](http://localhost:5000/) e confira se o navegador exibe a resposta JSON. O inicializador cria `bd/tony.db` e pode ser executado novamente sem apagar os dados existentes.
+O inicializador cria `bd/tony.db` e prepara uma construtora fictícia. Anote o `construtora_id` que o terminal mostrar para usar nos exemplos. Reexecutar o inicializador preserva os registros e evita duplicar a construtora de demonstração.
 
-Para o relatório, capture o DER, as tabelas criadas, o terminal com o Flask rodando e o navegador com a URL e o JSON visíveis.
+Com o Flask em execução, abra o [painel de obras](http://127.0.0.1:5000/painel). Use a porta indicada no terminal se ela for diferente de `5000`.
 
-## Etapa 2 — CRUD de obras
+## API REST
 
-A API acessa `bd/tony.db` por meio de `backend/database.py`. Para preparar uma construtora fictícia, rode na raiz do projeto:
+**Endereço base** `http://127.0.0.1:5000` · **Formato** JSON
 
-```powershell
-.\backend\venv\Scripts\python.exe bd/init_db.py --demo
-```
+| Verbo | Endpoint | Operação | Sucesso | Erros |
+| --- | --- | --- | --- | --- |
+| GET | `/` | Verifica se a API está em execução | `200` objeto de status | |
+| GET | `/obras` | Lista as obras em ordem de ID | `200` array de obras | |
+| GET | `/obras/{id}` | Consulta uma obra | `200` objeto da obra | `404` |
+| POST | `/obras` | Cadastra uma obra | `201` objeto da obra e cabeçalho `Location` | `400` |
+| PUT | `/obras/{id}` | Substitui os dados de uma obra | `200` objeto atualizado | `400`, `404` |
+| DELETE | `/obras/{id}` | Exclui uma obra sem registros vinculados | `200` objeto de confirmação | `404`, `409` |
 
-Anote o `construtora_id` exibido. O comando pode ser repetido sem duplicar a construtora de demonstração. Inicie a API como na Etapa 1.
+Substitua `{id}` pelo ID numérico retornado no cadastro. O painel em `GET /painel` entrega HTML e usa `GET /obras` e `POST /obras` pelo JavaScript.
 
-| Método | Rota | Resultado esperado |
-|---|---|---|
-| POST | `/obras` | Cadastra uma obra e retorna o registro com seu ID (201). |
-| GET | `/obras` | Lista as obras salvas (200). |
-| GET | `/obras/<id>` | Consulta uma obra pelo ID (200). |
-| PUT | `/obras/<id>` | Substitui os dados da obra pelo JSON enviado (200). |
-| DELETE | `/obras/<id>` | Exclui uma obra sem dependências (200). |
+### Enviar JSON com POST e PUT
 
-### Demonstração no Thunder Client
-
-Se preferir importar as quatro requisições, use `docs/tony-etapa-2.postman_collection.json` em **Collections → Import** no Thunder Client ou no Postman. Ajuste `construtora_id` e preencha `obra_id` com o ID que o POST retornar antes de editar ou excluir.
-
-Crie uma coleção para o TONY e use `http://localhost:5000` como endereço base. Em POST e PUT, selecione **Body → JSON**. No exemplo, substitua `1` pelo ID da construtora fictícia exibido no terminal.
+Selecione **Body → JSON** no Thunder Client ou envie o cabeçalho `Content-Type: application/json`. Exemplo de corpo para `POST /obras` ou `PUT /obras/1`:
 
 ```json
 {
   "construtora_id": 1,
   "nome": "Reforma de demonstração",
   "local": "Cascavel, PR",
+  "data_inicio": null,
+  "previsao_entrega": "2026-12-15",
   "status": "planejada"
 }
 ```
 
-1. Envie o POST e anote o ID da obra retornado. Capture o status 201.
-2. Reinicie a API e faça o GET de listagem. Capture o status 200 e a obra na resposta.
-3. Faça o PUT com o ID da obra, envie o corpo completo e troque o status para `em_andamento`. Capture o status 200 e o novo valor.
-4. Faça o DELETE dessa obra de demonstração. Capture o status 200. Repetir a exclusão do mesmo ID deve retornar 404.
+- `construtora_id` e `nome` são obrigatórios. Use o ID inteiro positivo de uma construtora existente e um nome preenchido.
+- `local`, `data_inicio` e `previsao_entrega` aceitam texto ou `null`. Use `AAAA-MM-DD` para datas.
+- `status` aceita `planejada`, `em_andamento` ou `concluida`. Se for omitido, a API usa `planejada`.
+- O `PUT` substitui todos os dados da obra. Reenvie os campos que deseja manter. Campos opcionais omitidos ficam nulos, e o status omitido volta ao valor padrão.
 
-Dados inválidos retornam 400. Consultar, editar ou excluir um ID inexistente retorna 404. A exclusão de obra com dados vinculados retorna 409 e preserva os registros. As datas são campos de texto opcionais. Se usá-las, prefira o formato `AAAA-MM-DD`.
+### Respostas JSON de sucesso
 
-## Etapa 3 — Cadastro e listagem pela interface
+**GET /** · `200 OK`
 
-Prepare o banco com `bd/init_db.py --demo`, inicie `backend/app.py` e abra [http://127.0.0.1:5000/painel](http://127.0.0.1:5000/painel).
+```json
+{
+  "status": "sucesso",
+  "projeto": "TONY Gestão de Obras",
+  "mensagem": "API da Etapa 1 em execução."
+}
+```
 
-O Flask serve a página e a API na mesma origem. A tela em `frontend/obras.html` usa as cores, os ícones e a tipografia do protótipo do Figma. O JavaScript em `frontend/assets/obras.js` faz o `POST /obras` ao enviar o formulário e o `GET /obras` ao abrir a página e depois de cada cadastro.
+**GET /obras/1** · `200 OK`. O mesmo formato é retornado por **POST /obras** com `201 Created` e por **PUT /obras/1** com `200 OK`. No cadastro, o cabeçalho `Location` indica a rota do ID criado, por exemplo `/obras/1`.
 
-Para as evidências da recuperação, abra **Nova obra**, preencha uma obra fictícia e capture o formulário antes do envio. Cadastre a obra e capture a confirmação e a listagem. Recarregue para verificar que a obra continua na lista. Por fim, confira a linha na tabela `obras` de `bd/tony.db` no VS Code.
+```json
+{
+  "id": 1,
+  "construtora_id": 1,
+  "nome": "Reforma de demonstração",
+  "local": "Cascavel, PR",
+  "data_inicio": null,
+  "previsao_entrega": "2026-12-15",
+  "status": "planejada"
+}
+```
+
+**GET /obras** · `200 OK`. Cada item tem o mesmo formato do exemplo acima. Quando o banco está sem obras, a resposta é `[]`.
+
+```json
+[
+  {
+    "id": 1,
+    "construtora_id": 1,
+    "nome": "Reforma de demonstração",
+    "local": "Cascavel, PR",
+    "data_inicio": null,
+    "previsao_entrega": "2026-12-15",
+    "status": "planejada"
+  }
+]
+```
+
+**DELETE /obras/1** · `200 OK`
+
+```json
+{"id": 1, "mensagem": "Obra excluída."}
+```
+
+### Respostas JSON de erro
+
+| Código | Quando ocorre | Exemplo de resposta |
+| --- | --- | --- |
+| `400` | JSON inválido, campo obrigatório ausente ou inválido, ou construtora inexistente | `{"erro":"A construtora informada não existe."}` |
+| `404` | O ID numérico informado em GET, PUT ou DELETE não identifica uma obra | `{"erro":"Obra não encontrada."}` |
+| `409` | A obra a excluir tem etapas, participantes ou registros vinculados | `{"erro":"A obra tem etapas, participantes ou registros vinculados."}` |
+
+### Testar o fluxo de obras
+
+A coleção [Thunder Client / Postman](docs/tony-etapa-2.postman_collection.json) traz as operações de cadastro, listagem, edição e exclusão. Use a URL base da sua execução e substitua `construtora_id` pelo valor informado na inicialização.
+
+1. Cadastre uma obra de teste com `POST /obras` e anote o ID da resposta `201`.
+2. Consulte a lista com `GET /obras` e a obra com `GET /obras/{id}`.
+3. Envie o JSON completo para `PUT /obras/{id}`, com `status` igual a `em_andamento`.
+4. Exclua a obra de teste com `DELETE /obras/{id}`. Uma nova consulta ao mesmo ID deve retornar `404`.
+
+## Estrutura do projeto
+
+| Pasta | Conteúdo |
+| --- | --- |
+| `backend/` | API Flask, conexão com o SQLite e dependências Python |
+| `bd/` | Script SQL, inicializador e [diagrama do banco](bd/tony-der.drawio) |
+| `frontend/` | Página de obras em HTML, CSS e JavaScript |
+
+O painel envia os dados em JSON por meio de `fetch`. O Flask valida os campos e acessa o SQLite. Depois de cadastrar uma obra ou recarregar o painel, o JavaScript busca a lista atualizada pela API.
