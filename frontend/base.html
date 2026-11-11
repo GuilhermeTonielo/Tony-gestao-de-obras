@@ -1,0 +1,64 @@
+{% macro icon(name, size=20) -%}
+  <img src="{{ url_for('static', filename=name ~ '.svg') }}" width="{{ size }}" height="{{ size }}" alt="">
+{%- endmacro %}
+{% set nome_usuario = g.usuario.nome if g.usuario else 'Guilherme Tonielo' %}
+{% set iniciais = (nome_usuario.split()[:2] | map('first') | join | upper) %}
+{% set menu = [
+  ('Início', 'Visão geral', 'home', 'painel.inicio', true),
+  ('Obras', 'Obras', 'works', 'painel_obras', true),
+  ('Financeiro', 'Financeiro', 'wallet', 'painel.financeiro', pode_gerenciar()),
+  ('Diário', 'Diário de obra', 'book', 'painel.diario', true),
+  ('Aprovações', 'Aprovações', 'check', 'painel.aprovacoes', pode_gerenciar() or g.usuario.perfil == 'cliente')
+] %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf9f6">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ titulo | default('Visão geral') }} · TONY Gestão de Obras</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='obras.css') }}">
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+  <aside class="sidebar" aria-label="Escritório">
+    <a href="{{ url_for('painel.inicio') }}" class="brand" aria-label="TONY Gestão de Obras">
+      {{ icon('brand-pc', 30) }} <span>TONY</span>
+    </a>
+    <div class="workspace"><strong>{{ 'Portal do cliente' if g.usuario and g.usuario.perfil == 'cliente' else 'Seu escritório' }}</strong><span>Gestão de obras</span></div>
+    <nav class="side-nav" aria-label="Navegação principal">
+      {% for curto, nome, asset, endpoint, visivel in menu if visivel %}
+        <a class="nav-item{% if ativo == endpoint %} active{% endif %}" href="{{ url_for(endpoint) }}"
+           {% if ativo == endpoint %}aria-current="page"{% endif %}>{{ icon(asset ~ '-pc') }}{{ nome }}</a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-footer">
+      <p class="eyebrow">Espaço de trabalho</p>
+      <a class="nav-item{% if ativo == 'painel.configuracoes' %} active{% endif %}" href="{{ url_for('painel.configuracoes') }}"
+         {% if ativo == 'painel.configuracoes' %}aria-current="page"{% endif %}>{{ icon('settings') }}Configurações</a>
+      <div class="profile"><span class="avatar">{{ iniciais }}</span><div><strong>{{ nome_usuario }}</strong><small>{{ perfis[g.usuario.perfil] if g.usuario else 'Demonstração' }}</small></div></div>
+    </div>
+  </aside>
+  <header class="mobile-header">
+    <a href="{{ url_for('painel.inicio') }}" class="brand" aria-label="TONY Gestão de Obras">{{ icon('brand-mobile', 24) }} <span>TONY</span></a>
+    <a class="avatar" href="{{ url_for('painel.configuracoes') }}" aria-label="Configurações">{{ iniciais }}</a>
+  </header>
+  <main class="main" id="conteudo">
+    <div class="desktop-header">
+      <p class="eyebrow">Escritório / {{ titulo }}</p>
+      {% block ferramentas %}{% endblock %}
+    </div>
+    {% for categoria, mensagem in get_flashed_messages(with_categories=true) %}
+      <p class="feedback{% if categoria == 'erro' %} error{% endif %}" role="{{ 'alert' if categoria == 'erro' else 'status' }}">{{ mensagem }}</p>
+    {% endfor %}
+    {% block conteudo %}{% endblock %}
+  </main>
+  <nav class="mobile-nav" aria-label="Navegação no celular">
+    {% for curto, nome, asset, endpoint, visivel in menu if visivel %}
+      <a href="{{ url_for(endpoint) }}" {% if ativo == endpoint %}aria-current="page"{% endif %}>{{ icon(asset ~ '-mobile', 22) }}{{ curto }}</a>
+    {% endfor %}
+  </nav>
+  {% block dialogos %}{% endblock %}
+</body>
+</html>

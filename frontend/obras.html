@@ -1,62 +1,15 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf9f6">
-  <title>Obras · TONY Gestão de Obras</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='obras.css') }}">
-  <script src="{{ url_for('static', filename='obras.js') }}" defer></script>
-</head>
-<body>
-  {% macro icon(name, size=20) -%}
-    <img src="{{ url_for('static', filename=name ~ '.svg') }}" width="{{ size }}" height="{{ size }}" alt="">
-  {%- endmacro %}
-  {% set menu = [
-    ('Visão geral', 'Início', 'home'),
-    ('Obras', 'Obras', 'works'),
-    ('Financeiro', 'Financeiro', 'wallet'),
-    ('Diário de obra', 'Diário', 'book'),
-    ('Aprovações', 'Aprovações', 'check')
-  ] %}
-
-  <aside class="sidebar" aria-label="Escritório">
-    <a href="{{ url_for('painel_obras') }}" class="brand" aria-label="TONY Gestão de Obras">
-      {{ icon('brand-pc', 30) }} <span>TONY</span>
-    </a>
-    <div class="workspace"><strong>Seu escritório</strong><span>Gestão de obras</span></div>
-    <nav class="side-nav" aria-label="Navegação principal">
-      {% for label, mobile, asset in menu %}
-        {% if label == 'Obras' %}
-          <a class="nav-item active" href="{{ url_for('painel_obras') }}" aria-current="page">{{ icon(asset ~ '-pc') }}{{ label }}</a>
-        {% else %}
-          <span class="nav-item" aria-disabled="true" title="Em uma etapa futura">{{ icon(asset ~ '-pc') }}{{ label }}</span>
-        {% endif %}
-      {% endfor %}
-    </nav>
-    <div class="sidebar-footer">
-      <p class="eyebrow">Espaço de trabalho</p>
-      <span class="nav-item" aria-disabled="true" title="Em uma etapa futura">{{ icon('settings') }}Configurações</span>
-      <div class="profile"><span class="avatar">GT</span><div><strong>Guilherme Tonielo</strong><small>Demonstração</small></div></div>
-    </div>
-  </aside>
-
-  <header class="mobile-header">
-    <a href="{{ url_for('painel_obras') }}" class="brand" aria-label="TONY Gestão de Obras">{{ icon('brand-mobile', 24) }} <span>TONY</span></a>
-    <div class="header-tools">{{ icon('bell-mobile') }} <span class="avatar">GT</span></div>
-  </header>
-  <main class="main" id="conteudo">
-    <div class="desktop-header">
-      <p class="eyebrow">Escritório / Obras</p>
-      <div class="header-tools">
-        <button type="button" class="search-link" id="focar-busca">{{ icon('search') }} Buscar na plataforma</button>
-        {{ icon('bell-pc') }} <span class="avatar">GT</span>
-      </div>
-    </div>
-
-    <div class="page-heading">
+{% extends 'base.html' %}
+{% from 'partes.html' import campos_obra with context %}
+{% set titulo = 'Obras' %}
+{% set ativo = 'painel_obras' %}
+{% block scripts %}<script src="{{ url_for('static', filename='obras.js') }}" defer></script>{% endblock %}
+{% block ferramentas %}
+<button type="button" class="search-link" id="focar-busca">{{ icon('search') }} Buscar obras</button>
+{% endblock %}
+{% block conteudo %}
+<div class="page-heading">
       <div><h1>Obras</h1><p>Acompanhe cada projeto, da primeira etapa à entrega.</p></div>
-      <button type="button" class="primary" id="nova-obra">Nova obra</button>
+      {% if pode_gerenciar() %}<button type="button" class="primary" id="nova-obra">Nova obra</button>{% endif %}
     </div>
 
     <div class="feedback" id="feedback" role="status" hidden></div>
@@ -72,42 +25,16 @@
     <p class="list-state" id="estado-lista" role="status">Carregando obras…</p>
     <div class="cards" id="lista-obras" aria-label="Obras cadastradas"></div>
     <p class="list-meta" id="total-obras"></p>
-  </main>
-
-  <nav class="mobile-nav" aria-label="Navegação no celular">
-    {% for label, mobile, asset in menu %}
-      {% if label == 'Obras' %}
-        <a href="{{ url_for('painel_obras') }}" aria-current="page">{{ icon(asset ~ '-mobile', 22) }}{{ mobile }}</a>
-      {% else %}
-        <span aria-disabled="true">{{ icon(asset ~ '-mobile', 22) }}{{ mobile }}</span>
-      {% endif %}
-    {% endfor %}
-  </nav>
-
-  <dialog id="dialogo-obra" aria-labelledby="titulo-dialogo">
+{% endblock %}
+{% block dialogos %}
+{% if pode_gerenciar() %}
+<dialog id="dialogo-obra" aria-labelledby="titulo-dialogo">
     <div class="dialog-heading">
       <div><h2 id="titulo-dialogo">Nova obra</h2><p>Cadastre a obra para acompanhar o andamento.</p></div>
       <button type="button" class="close" id="fechar-formulario" aria-label="Fechar formulário">×</button>
     </div>
     <form id="form-obra">
-      <label>Nome da obra<input name="nome" required maxlength="120" autocomplete="off" placeholder="Ex.: Casa Aurora"></label>
-      <label>Local<input name="local" maxlength="120" placeholder="Ex.: Cascavel, PR"></label>
-      <div class="field-row">
-        <label>Construtora
-          <select name="construtora_id" required>
-            {% for construtora in construtoras %}<option value="{{ construtora.id }}">{{ construtora.nome }}</option>{% endfor %}
-            {% if not construtoras %}<option value="">Nenhuma cadastrada</option>{% endif %}
-          </select>
-        </label>
-        <label>Status
-          <select name="status">
-            <option value="planejada">Planejada</option>
-            <option value="em_andamento">Em andamento</option>
-            <option value="concluida">Concluída</option>
-          </select>
-        </label>
-      </div>
-      <label>Previsão de entrega<input name="previsao_entrega" type="date"></label>
+      {{ campos_obra({}, construtoras) }}
       {% if not construtoras %}
         <p class="feedback error">Prepare a construtora de demonstração seguindo o README e recarregue a página.</p>
       {% endif %}
@@ -118,9 +45,10 @@
       </div>
     </form>
   </dialog>
-
-  <template id="cartao-obra">
-    <article class="card">
+{% endif %}
+<script type="application/json" id="resumo-obras">{{ resumo | tojson }}</script>
+<template id="cartao-obra">
+    <a class="card card-link" data-url="{{ url_for('painel.detalhe', obra_id=0) }}">
       <div class="card-top">
         <picture><source media="(max-width: 720px)" srcset="{{ url_for('static', filename='card-mobile.svg') }}">{{ icon('card-pc', 28) }}</picture>
         <span class="badge" data-field="status"></span>
@@ -128,10 +56,9 @@
       <h2 data-field="nome"></h2>
       <p data-field="local"></p>
       <div class="card-rule"></div>
-      <div class="card-metric"><span>Execução</span><span>Sem medição</span></div>
-      <div class="card-track" aria-hidden="true"></div>
+      <div class="card-metric"><span>Execução</span><span data-field="progresso">Sem medição</span></div>
+      <div class="card-track" aria-hidden="true"><span data-field="barra"></span></div>
       <div class="card-bottom"><span data-field="entrega"></span><span class="avatar avatar-small" data-field="construtora"></span></div>
-    </article>
+    </a>
   </template>
-</body>
-</html>
+{% endblock %}

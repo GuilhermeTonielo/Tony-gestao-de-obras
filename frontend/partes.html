@@ -1,0 +1,39 @@
+{% macro csrf() -%}<input type="hidden" name="_csrf" value="{{ csrf_token() }}">{%- endmacro %}
+{% macro seletor(obras, obra) -%}
+  {% if obras %}
+    <form method="get" class="seletor-obra">
+      <label>Obra
+        <select name="obra">
+          {% for item in obras %}<option value="{{ item.id }}" {% if obra.id == item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}
+        </select>
+      </label>
+      <button type="submit" class="secondary">Exibir</button>
+    </form>
+  {% else %}
+    <p class="list-state bloco">Nenhuma obra disponível para sua conta.</p>
+  {% endif %}
+{%- endmacro %}
+{% macro indicador(rotulo, valor) -%}
+  <article class="card indicador"><span>{{ rotulo }}</span><strong>{{ valor }}</strong></article>
+{%- endmacro %}
+{% macro campos_obra(obra, construtoras) -%}
+  <label>Nome da obra<input name="nome" required maxlength="120" value="{{ obra.nome or '' }}" autocomplete="off" placeholder="Ex.: Casa Aurora"></label>
+  <label>Local<input name="local" maxlength="120" value="{{ obra.local or '' }}" placeholder="Ex.: Cascavel, PR"></label>
+  <div class="field-row">
+    <label>Construtora
+      <select name="construtora_id" required>
+        {% for item in construtoras %}<option value="{{ item.id }}" {% if obra.construtora_id == item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}
+        {% if not construtoras %}<option value="">Nenhuma cadastrada</option>{% endif %}
+      </select>
+    </label>
+    <label>Status
+      <select name="status">
+        {% for valor, nome in rotulos.items() %}<option value="{{ valor }}" {% if obra.status == valor %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="field-row">
+    <label>Data de início<input name="data_inicio" value="{{ obra.data_inicio or '' }}" type="date"></label>
+    <label>Previsão de entrega<input name="previsao_entrega" value="{{ obra.previsao_entrega or '' }}" type="date"></label>
+  </div>
+{%- endmacro %}

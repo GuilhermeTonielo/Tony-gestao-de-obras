@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% from 'partes.html' import csrf, seletor %}
+{% set titulo = 'Aprovações' %}
+{% set ativo = 'painel.aprovacoes' %}
+{% set nomes = {'pendente':'Aguardando aprovação','aprovada':'Aprovada','ajuste':'Ajuste solicitado'} %}
+{% block conteudo %}
+<div class="page-heading"><div><h1>Aprovações</h1><p>Solicitações de mudança e decisões sobre custo e prazo.</p></div></div>
+{{ seletor(obras, obra) }}
+{% if obra %}
+{% if pode_gerenciar() %}
+  <section class="card bloco">
+    <details><summary>Solicitar alteração</summary>
+      <form method="post" action="{{ url_for('painel.criar_alteracao', obra_id=obra.id) }}">
+        {{ csrf() }}
+        <label>Título<input name="titulo" maxlength="120" required></label>
+        <div class="field-row">
+          <label>Previsto no orçamento<input name="previsto" maxlength="300"></label>
+          <label>Alteração solicitada<input name="proposto" maxlength="300"></label>
+        </div>
+        <label>Justificativa<textarea name="justificativa" maxlength="1000" rows="3" required></textarea></label>
+        <div class="field-row">
+          <label>Impacto no orçamento (R$)<input name="impacto_valor" inputmode="decimal" value="0" required></label>
+          <label>Impacto no prazo (dias)<input name="impacto_dias" type="number" min="-3650" max="3650" value="0" required></label>
+        </div>
+        <div><button class="primary" type="submit">Enviar para aprovação</button></div>
+      </form>
+    </details>
+  </section>
+{% endif %}
+<section class="registros bloco" aria-label="Alterações da obra">
+  {% for item in alteracoes %}
+    <article class="card" id="alteracao-{{ item.id }}">
+      <div class="linha"><h2>{{ item.titulo }}</h2><span class="badge" data-status="{{ 'planejada' if item.status != 'aprovada' else 'concluida' }}">{{ nomes[item.status] }}</span></div>
+      <p class="texto-registro">{{ item.justificativa }}</p>
+      {% if item.previsto or item.proposto %}
+        <div class="resumo-obra">
+          <div><span>Previsto no orçamento</span><strong>{{ item.previsto or '—' }}</strong></div>
+          <div><span>Alteração solicitada</span><strong>{{ item.proposto or '—' }}</strong></div>
+        </div>
+      {% endif %}
+      <div class="resumo-obra">
+        <div><span>Impacto no orçamento</span><strong>{{ item.impacto_centavos | reais }}</strong></div>
+        <div><span>Impacto no prazo</span><strong>{{ '%+d' | format(item.impacto_dias) }} dias</strong></div>
+      </div>
+      {% for decisao in historico.get(item.id, []) %}
+        <p>{{ nomes[decisao.acao] }} por {{ decisao.autor or 'Equipe TONY (demonstração)' }} · {{ decisao.criado_em[:10] | data_br }} às {{ decisao.criado_em[11:16] }} UTC</p>
+        {% if decisao.motivo %}<p class="texto-registro">{{ decisao.motivo }}</p>{% endif %}
+      {% endfor %}
+      {% if item.status == 'pendente' and (g.demo or g.usuario.perfil == 'cliente') %}
+        <form method="post" action="{{ url_for('painel.decidir', obra_id=obra.id, alteracao_id=item.id) }}">
+          {{ csrf() }}<div><button class="primary" name="acao" value="aprovada" type="submit">Aprovar alteração</button></div>
+        </form>
+        <details><summary>Solicitar ajuste</summary>
+          <form method="post" action="{{ url_for('painel.decidir', obra_id=obra.id, alteracao_id=item.id) }}">
+            {{ csrf() }}<label>Motivo<textarea name="motivo" maxlength="1000" rows="2" required></textarea></label>
+            <div><button class="secondary" name="acao" value="ajuste" type="submit">Registrar pedido de ajuste</button></div>
+          </form>
+        </details>
+      {% endif %}
+    </article>
+  {% else %}<p class="list-state">Nenhuma alteração solicitada para esta obra.</p>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

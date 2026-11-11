@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from 'partes.html' import indicador %}
+{% set titulo = 'Visão geral' %}
+{% set ativo = 'painel.inicio' %}
+{% block conteudo %}
+<div class="page-heading">
+  <div><h1>Visão geral</h1><p>Acompanhe as obras e as próximas etapas.</p></div>
+  <a class="primary" href="{{ url_for('painel_obras') }}">Ver obras</a>
+</div>
+<div class="indicadores bloco">
+  {{ indicador('Obras em andamento', contagens.em_andamento) }}
+  {{ indicador('Em planejamento', contagens.planejada) }}
+  {{ indicador('Obras concluídas', contagens.concluida) }}
+</div>
+<div class="painel-duplo bloco">
+  <section class="card">
+    <h2>Obras</h2>
+    {% for obra in obras[:6] %}
+      <a class="linha link-linha" href="{{ url_for('painel.detalhe', obra_id=obra.id) }}">
+        <span><strong>{{ obra.nome }}</strong><small>{{ obra.local or 'Local não informado' }}</small></span>
+        <span class="badge" data-status="{{ obra.status }}">{{ rotulos[obra.status] }}</span>
+      </a>
+    {% else %}<p>Nenhuma obra cadastrada.</p>{% endfor %}
+  </section>
+  <section class="card">
+    <h2>Próximos prazos</h2>
+    {% for etapa in prazos %}
+      <a class="linha link-linha" href="{{ url_for('painel.detalhe', obra_id=etapa.obra_id) }}#etapas">
+        <span><strong>{{ etapa.nome }}</strong><small>{{ etapa.obra }} · {{ etapa.progresso }}%</small></span>
+        <time>{{ etapa.prazo | data_br }}</time>
+      </a>
+    {% else %}<p>Nenhuma etapa aberta com prazo definido.</p>{% endfor %}
+  </section>
+</div>
+{% if pode_gerenciar() or g.usuario.perfil == 'cliente' %}
+<section class="card bloco">
+  <h2>Aprovações pendentes</h2>
+  {% for item in pendencias %}
+    <a class="linha link-linha" href="{{ url_for('painel.aprovacoes', obra=item.obra_id) }}#alteracao-{{ item.id }}">
+      <span><strong>{{ item.titulo }}</strong><small>{{ item.obra }}</small></span>
+      <span>{{ item.impacto_centavos | reais }} · {{ '%+d' | format(item.impacto_dias) }} dias</span>
+    </a>
+  {% else %}<p>Nenhuma alteração aguarda decisão.</p>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

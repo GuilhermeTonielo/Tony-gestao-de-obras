@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from 'partes.html' import csrf, campos_obra with context %}
+{% set titulo = 'Detalhe da obra' %}
+{% set ativo = 'painel_obras' %}
+{% block scripts %}<script src="{{ url_for('static', filename='detalhe.js') }}" defer></script>{% endblock %}
+{% block conteudo %}
+<a class="voltar" href="{{ url_for('painel_obras') }}">← Todas as obras</a>
+<div class="page-heading">
+  <div><h1>{{ obra.nome }}</h1><p>{{ obra.local or 'Local não informado' }} · {{ obra.construtora }}</p></div>
+  <span class="badge" data-status="{{ obra.status }}">{{ rotulos[obra.status] }}</span>
+</div>
+<div class="card bloco resumo-obra">
+  <div><span>Início</span><strong>{{ obra.data_inicio | data_br }}</strong></div>
+  <div><span>Previsão de entrega</span><strong>{{ obra.previsao_entrega | data_br }}</strong></div>
+  <div><span>Avanço médio das etapas</span><strong>{{ (progresso ~ '%') if progresso is not none else 'Sem medição' }}</strong></div>
+</div>
+<nav class="atalhos bloco" aria-label="Módulos da obra">
+  <a class="secondary" href="#etapas">Etapas</a>
+  <a class="secondary" href="{{ url_for('painel.diario', obra=obra.id) }}">Diário de obra</a>
+  {% if pode_gerenciar() %}<a class="secondary" href="{{ url_for('painel.financeiro', obra=obra.id) }}">Financeiro</a>{% endif %}
+  {% if pode_gerenciar() or g.usuario.perfil == 'cliente' %}<a class="secondary" href="{{ url_for('painel.aprovacoes', obra=obra.id) }}">Aprovações</a>{% endif %}
+</nav>
+<section class="card bloco" id="etapas">
+  <div class="linha"><h2>Etapas</h2><span>{{ etapas | length }} no cronograma</span></div>
+  {% for etapa in etapas %}
+    <article class="registro-etapa">
+      <div class="linha"><strong>{{ etapa.ordem }}. {{ etapa.nome }}</strong><span>{{ etapa.prazo | data_br }}</span></div>
+      <progress value="{{ etapa.progresso }}" max="100" aria-label="Progresso de {{ etapa.nome }}">{{ etapa.progresso }}%</progress>
+      {% if g.demo or g.usuario.perfil != 'cliente' %}
+        <form method="post" class="form-inline" action="{{ url_for('painel.medir_etapa', obra_id=obra.id, etapa_id=etapa.id) }}">
+          {{ csrf() }}<label>Progresso (%)<input name="progresso" type="number" min="0" max="100" value="{{ etapa.progresso }}" required></label>
+          <button class="secondary" type="submit">Atualizar</button>
+        </form>
+      {% else %}<p>{{ etapa.progresso }}% concluído</p>{% endif %}
+    </article>
+  {% else %}<p>Nenhuma etapa cadastrada.</p>{% endfor %}
+  {% if pode_gerenciar() %}
+    <details><summary>Nova etapa</summary>
+      <form method="post" action="{{ url_for('painel.criar_etapa', obra_id=obra.id) }}">
+        {{ csrf() }}
+        <div class="field-row"><label>Nome<input name="nome" maxlength="120" required></label><label>Prazo<input name="prazo" type="date"></label></div>
+        <div><button class="primary" type="submit">Cadastrar etapa</button></div>
+      </form>
+    </details>
+  {% endif %}
+</section>
+{% if pode_gerenciar() %}
+<section class="card bloco">
+  <div class="linha"><h2>Equipe e cliente</h2><a class="secondary" href="{{ url_for('painel.configuracoes') }}">Gerenciar acessos</a></div>
+  {% for membro in membros %}
+    <div class="linha"><strong>{{ membro.nome }}</strong><span>{{ perfis[membro.perfil] }}</span></div>
+  {% else %}<p>Nenhum acesso vinculado a esta obra.</p>{% endfor %}
+</section>
+<section class="card bloco">
+  <details><summary>Editar dados da obra</summary>
+    <form id="editar-obra" data-url="{{ url_for('atualizar_obra', obra_id=obra.id) }}">
+      {{ campos_obra(obra, construtoras) }}
+      <div><button class="primary" type="submit">Salvar alterações</button></div>
+    </form>
+  </details>
+  <p id="erro-obra" class="feedback error" role="alert" hidden></p>
+  <div><button class="secondary perigo" id="excluir-obra" type="button">Excluir obra</button></div>
+</section>
+{% endif %}
+{% endblock %}
+{% block dialogos %}
+{% if pode_gerenciar() %}
+<dialog id="confirmar-exclusao" aria-labelledby="titulo-exclusao">
+  <div class="dialog-heading"><div><h2 id="titulo-exclusao">Excluir obra?</h2><p>{{ obra.nome }} será removida se estiver sem registros vinculados.</p></div></div>
+  <div class="dialog-actions"><button class="secondary" id="cancelar-exclusao" type="button">Cancelar</button>
+    <button class="primary" id="confirmar-obra" type="button" data-url="{{ url_for('excluir_obra', obra_id=obra.id) }}" data-retorno="{{ url_for('painel_obras') }}">Confirmar exclusão</button></div>
+</dialog>
+{% endif %}
+{% endblock %}

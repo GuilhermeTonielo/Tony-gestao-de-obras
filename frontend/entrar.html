@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · TONY Gestão de Obras</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='obras.css') }}">
+</head>
+<body class="acesso">
+  <main class="card">
+    <h1>Entrar no TONY</h1>
+    {% for mensagem in get_flashed_messages() %}<p class="feedback error" role="alert">{{ mensagem }}</p>{% endfor %}
+    <form method="post">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label>E-mail<input type="email" name="email" autocomplete="username" required></label>
+      <label>Senha<input type="password" name="senha" autocomplete="current-password" required></label>
+      <button class="primary" type="submit">Entrar</button>
+    </form>
+    {% if g.demo %}<a class="voltar" href="{{ url_for('painel.inicio') }}">Abrir demonstração local</a>{% endif %}
+  </main>
+</body>
+</html>

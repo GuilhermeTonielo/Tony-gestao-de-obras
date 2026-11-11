@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% from 'partes.html' import csrf %}
+{% set titulo = 'Configurações' %}
+{% set ativo = 'painel.configuracoes' %}
+{% block conteudo %}
+<div class="page-heading"><div><h1>Configurações</h1><p>Conta e acessos às obras.</p></div></div>
+<section class="card bloco">
+  <h2>Sua conta</h2>
+  {% if g.usuario %}
+    <p>{{ g.usuario.nome }} · {{ perfis[g.usuario.perfil] }} · {{ g.usuario.email }}</p>
+    <form method="post" action="{{ url_for('painel.sair') }}">{{ csrf() }}<div><button class="secondary" type="submit">Sair</button></div></form>
+  {% else %}
+    <p>Ambiente local de demonstração.</p>
+    <div><a class="secondary" href="{{ url_for('painel.entrar') }}">Entrar com uma conta</a></div>
+  {% endif %}
+</section>
+{% if pode_gerenciar() %}
+  <section class="card bloco">
+    <h2>Equipe e clientes</h2>
+    {% for membro in membros %}
+      <div class="linha">
+        <span><strong>{{ membro.nome }} · {{ perfis[membro.perfil] }}</strong><small>{{ membro.obra }} · {{ membro.email }}</small></span>
+        <form method="post" action="{{ url_for('painel.remover_acesso', obra_id=membro.obra_id, usuario_id=membro.usuario_id) }}">
+          {{ csrf() }}<button class="secondary perigo" type="submit">Revogar acesso</button>
+        </form>
+      </div>
+    {% else %}<p>Nenhum membro vinculado.</p>{% endfor %}
+    {% if obras %}
+    <details><summary>Adicionar acesso à obra</summary>
+      <form method="post">
+        {{ csrf() }}
+        <div class="field-row">
+          <label>Obra<select name="obra_id">{% for obra in obras %}<option value="{{ obra.id }}">{{ obra.nome }}</option>{% endfor %}</select></label>
+          <label>Perfil<select name="perfil"><option value="mestre_de_obras">Mestre de obras</option><option value="cliente">Cliente</option></select></label>
+        </div>
+        <label>E-mail<input name="email" type="email" maxlength="254" required></label>
+        <p>Preencha nome e senha para uma conta nova. Para vincular uma conta existente, informe o e-mail e o perfil.</p>
+        <div class="field-row">
+          <label>Nome<input name="nome" maxlength="120"></label>
+          <label>Senha inicial<input name="senha" type="password" autocomplete="new-password" minlength="8" maxlength="128"></label>
+        </div>
+        <div><button class="primary" type="submit">Vincular acesso</button></div>
+      </form>
+    </details>
+    {% endif %}
+  </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% from 'partes.html' import csrf, seletor %}
+{% set titulo = 'Diário de obra' %}
+{% set ativo = 'painel.diario' %}
+{% block conteudo %}
+<div class="page-heading"><div><h1>Diário de obra</h1><p>Atividades, ocorrências e fotos do canteiro.</p></div></div>
+{{ seletor(obras, obra) }}
+{% if obra %}
+  {% if g.demo or g.usuario.perfil != 'cliente' %}
+  <section class="card bloco">
+    <details><summary>Novo registro</summary>
+      <form method="post" enctype="multipart/form-data" action="{{ url_for('painel.criar_diario', obra_id=obra.id) }}">
+        {{ csrf() }}
+        <div class="field-row">
+          <label>Data<input type="date" name="data_registro" value="{{ hoje }}" required></label>
+          <label>Equipe<input name="equipe" maxlength="120"></label>
+        </div>
+        <label>Atividades e ocorrências<textarea name="atividades" maxlength="2000" rows="3" required></textarea></label>
+        <div class="field-row">
+          <label>Condições do canteiro<input name="condicoes" maxlength="120"></label>
+          <label>Próxima atividade<input name="proxima_atividade" maxlength="300"></label>
+        </div>
+        <label>Checklist (um item por linha)<textarea name="checklist" maxlength="1500" rows="3"></textarea></label>
+        <label>Foto do registro (JPEG ou PNG, até 5 MB)<input name="foto" type="file" accept="image/jpeg,image/png"></label>
+        <div><button class="primary" type="submit">Salvar rascunho</button></div>
+      </form>
+    </details>
+  </section>
+  {% endif %}
+  <section class="registros bloco" aria-label="Registros do diário">
+  {% for item in registros %}
+    <article class="card">
+      <div class="linha">
+        <div><h2>{{ item.data_registro | data_br }}</h2><small>{{ item.autor }}</small></div>
+        <span class="badge" data-status="{{ 'planejada' if item.status == 'rascunho' else 'concluida' }}">{{ 'Rascunho' if item.status == 'rascunho' else 'Finalizado' }}</span>
+      </div>
+      <p class="texto-registro">{{ item.atividades }}</p>
+      {% if item.equipe %}<p><strong>Equipe</strong> {{ item.equipe }}</p>{% endif %}
+      {% if item.condicoes %}<p><strong>Condições</strong> {{ item.condicoes }}</p>{% endif %}
+      {% if item.proxima_atividade %}<p><strong>Próxima atividade</strong> {{ item.proxima_atividade }}</p>{% endif %}
+      {% for id in fotos.get(item.id, []) %}
+        <a class="foto-diario" href="{{ url_for('painel.foto_diario', foto_id=id) }}">
+          <img loading="lazy" src="{{ url_for('painel.foto_diario', foto_id=id) }}" alt="Foto do diário de {{ item.data_registro | data_br }}">
+        </a>
+      {% endfor %}
+      {% if checklist.get(item.id) %}
+        {% if item.status == 'rascunho' and (pode_gerenciar() or item.autor_id == g.usuario.id) %}
+        <form method="post" action="{{ url_for('painel.atualizar_diario', obra_id=obra.id, registro_id=item.id) }}">
+          {{ csrf() }}
+          <fieldset class="checklist"><legend>Checklist do dia</legend>
+            {% for tarefa in checklist[item.id] %}
+              <label><input type="checkbox" name="concluido" value="{{ tarefa.id }}" {% if tarefa.concluido %}checked{% endif %}>{{ tarefa.descricao }}</label>
+            {% endfor %}
+          </fieldset>
+          <div><button class="secondary" name="acao" value="checklist" type="submit">Salvar checklist</button></div>
+        </form>
+        {% else %}
+        <div><strong>Checklist do dia</strong>
+          <ul>{% for tarefa in checklist[item.id] %}<li>{{ tarefa.descricao }} · {{ 'Concluído' if tarefa.concluido else 'Pendente' }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+      {% endif %}
+      {% if item.status == 'rascunho' and (pode_gerenciar() or item.autor_id == g.usuario.id) %}
+      <form method="post" action="{{ url_for('painel.atualizar_diario', obra_id=obra.id, registro_id=item.id) }}">
+        {{ csrf() }}<div><button class="secondary" name="acao" value="finalizar" type="submit">Finalizar registro</button></div>
+      </form>
+      {% elif item.status == 'finalizado' and pode_gerenciar() %}
+      <form method="post" class="form-inline" action="{{ url_for('painel.atualizar_diario', obra_id=obra.id, registro_id=item.id) }}">
+        {{ csrf() }}
+        <span>{{ 'Visível para o cliente' if item.compartilhado_com_cliente else 'Visível apenas para a equipe' }}</span>
+        <button class="secondary" name="acao" value="{{ 'ocultar' if item.compartilhado_com_cliente else 'compartilhar' }}" type="submit">{{ 'Ocultar do cliente' if item.compartilhado_com_cliente else 'Compartilhar com cliente' }}</button>
+      </form>
+      {% endif %}
+    </article>
+  {% else %}<p class="list-state">Nenhum registro disponível para esta obra.</p>{% endfor %}
+  </section>
+{% endif %}
+{% endblock %}

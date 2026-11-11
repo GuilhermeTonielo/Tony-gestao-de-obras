@@ -8,9 +8,11 @@ const estadoLista = document.querySelector("#estado-lista");
 const total = document.querySelector("#total-obras");
 const busca = document.querySelector("#buscar");
 const cartao = document.querySelector("#cartao-obra");
+const resumo = JSON.parse(document.querySelector("#resumo-obras").textContent);
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 const filtros = [...document.querySelectorAll("[data-filter]")];
 const construtoras = new Map(
-  Array.from(formulario.elements.construtora_id.options, opcao => [opcao.value, opcao.text]),
+  Array.from(formulario?.elements.construtora_id.options ?? [], opcao => [opcao.value, opcao.text]),
 );
 const rotulos = {
   planejada: "Planejada",
@@ -46,17 +48,24 @@ function renderizarObras() {
   const fragmento = document.createDocumentFragment();
   for (const obra of visiveis) {
     const item = cartao.content.cloneNode(true);
+    const link = item.querySelector(".card-link");
+    link.href = link.dataset.url.replace(/0$/, String(obra.id));
     const campo = nome => item.querySelector(`[data-field="${nome}"]`);
     campo("nome").textContent = obra.nome;
     campo("local").textContent = obra.local || "Local não informado";
     campo("status").textContent = rotulos[obra.status] || obra.status;
     campo("status").dataset.status = obra.status;
+    const progresso = resumo[obra.id]?.progresso;
+    if (progresso != null) {
+      campo("progresso").textContent = `${progresso}%`;
+      campo("barra").style.width = `${progresso}%`;
+    }
 
     const data = obra.previsao_entrega?.split("-");
     campo("entrega").textContent = data?.length === 3
       ? `Entrega · ${data[2]}/${data[1]}/${data[0]}`
       : "Entrega não definida";
-    const construtora = construtoras.get(String(obra.construtora_id));
+    const construtora = resumo[obra.id]?.construtora ?? construtoras.get(String(obra.construtora_id));
     const avatar = campo("construtora");
     if (construtora) {
       avatar.textContent = construtora.split(/\s+/).slice(0, 2).map(palavra => palavra[0]).join("").toUpperCase();
@@ -103,7 +112,7 @@ async function cadastrarObra(evento) {
   try {
     const resposta = await fetch("/obras", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrfToken },
       body: JSON.stringify(dados),
     });
     if (!resposta.ok) {
@@ -125,12 +134,15 @@ async function cadastrarObra(evento) {
   }
 }
 
-document.querySelector("#nova-obra").addEventListener("click", () => {
-  mostrarMensagem(erroFormulario, "");
-  dialogo.showModal();
-});
-for (const seletor of ["#fechar-formulario", "#cancelar-cadastro"]) {
-  document.querySelector(seletor).addEventListener("click", () => dialogo.close());
+if (formulario) {
+  document.querySelector("#nova-obra").addEventListener("click", () => {
+    mostrarMensagem(erroFormulario, "");
+    dialogo.showModal();
+  });
+  for (const seletor of ["#fechar-formulario", "#cancelar-cadastro"]) {
+    document.querySelector(seletor).addEventListener("click", () => dialogo.close());
+  }
+  formulario.addEventListener("submit", cadastrarObra);
 }
 document.querySelector("#focar-busca").addEventListener("click", () => busca.focus());
 busca.addEventListener("input", renderizarObras);
@@ -140,5 +152,4 @@ for (const botao of filtros) {
     renderizarObras();
   });
 }
-formulario.addEventListener("submit", cadastrarObra);
 carregarObras();

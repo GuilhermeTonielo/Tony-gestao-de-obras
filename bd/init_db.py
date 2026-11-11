@@ -9,7 +9,7 @@ from pathlib import Path
 def inicializar_banco(com_dados_demo: bool = False) -> None:
     pasta = Path(__file__).resolve().parent
     banco = pasta / "tony.db"
-    script = (pasta / "script.sql").read_text(encoding="utf-8")
+    script = "\n".join((pasta / nome).read_text(encoding="utf-8") for nome in ("script.sql", "modulos.sql"))
 
     with closing(sqlite3.connect(banco)) as conexao:
         with conexao:

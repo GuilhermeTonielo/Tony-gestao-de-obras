@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% from 'partes.html' import csrf, seletor, indicador %}
+{% set titulo = 'Financeiro' %}
+{% set ativo = 'painel.financeiro' %}
+{% block conteudo %}
+<div class="page-heading"><div><h1>Financeiro</h1><p>Acompanhe orçamento, pagamentos e recebimentos por obra.</p></div></div>
+{{ seletor(obras, obra) }}
+{% if obra %}
+<div class="indicadores bloco">
+  {{ indicador('Orçamento atualizado', orcado | reais) }}
+  {{ indicador('Recebido', receitas | reais) }}
+  {{ indicador('Pago', despesas | reais) }}
+  {{ indicador('Saldo realizado', (receitas - despesas) | reais) }}
+</div>
+<div class="painel-duplo bloco">
+  <section class="card">
+    <h2>Orçamento</h2>
+    {% for item in itens %}
+      <div class="linha"><span>{{ item.descricao }}{% if item.etapa %}<small>{{ item.etapa }}</small>{% endif %}</span><strong>{{ item.valor_centavos | reais }}</strong></div>
+    {% else %}<p>Nenhum item de orçamento.</p>{% endfor %}
+    {% if impacto %}<div class="linha"><span>Alterações aprovadas</span><strong>{{ impacto | reais }}</strong></div>{% endif %}
+    <div class="linha"><span>Orçado menos despesas pagas</span><strong>{{ (orcado - despesas) | reais }}</strong></div>
+    <details><summary>Novo item de orçamento</summary>
+      <form method="post" action="{{ url_for('painel.criar_financeiro', obra_id=obra.id) }}">
+        {{ csrf() }}<input type="hidden" name="tipo" value="orcamento">
+        <label>Descrição<input name="descricao" required maxlength="160"></label>
+        {% if etapas %}<label>Etapa<select name="etapa_id"><option value="">Geral da obra</option>
+          {% for etapa in etapas %}<option value="{{ etapa.id }}">{{ etapa.nome }}</option>{% endfor %}
+        </select></label>{% endif %}
+        <label>Valor (R$)<input name="valor" inputmode="decimal" required placeholder="1500,00"></label>
+        <div><button class="primary" type="submit">Adicionar item</button></div>
+      </form>
+    </details>
+  </section>
+  <section class="card">
+    <h2>Lançamentos</h2>
+    {% for item in lancamentos %}
+      <div class="registro-etapa">
+        <div class="linha"><strong>{{ item.descricao }}</strong><strong>{{ item.valor_centavos | reais }}</strong></div>
+        <p>{{ 'Receita' if item.tipo == 'receita' else 'Despesa' }} · {{ item.vencimento | data_br }} · {{ 'Liquidado' if item.liquidado else 'Pendente' }}</p>
+        <form method="post" class="form-inline" action="{{ url_for('painel.situacao_financeira', obra_id=obra.id, lancamento_id=item.id) }}">
+          {{ csrf() }}
+          <button class="secondary" name="liquidado" value="{{ 0 if item.liquidado else 1 }}" type="submit">{{ 'Reabrir lançamento' if item.liquidado else 'Marcar como liquidado' }}</button>
+        </form>
+      </div>
+    {% else %}<p>Nenhum lançamento registrado.</p>{% endfor %}
+    <details><summary>Novo lançamento</summary>
+      <form method="post" action="{{ url_for('painel.criar_financeiro', obra_id=obra.id) }}">
+        {{ csrf() }}
+        <label>Descrição<input name="descricao" required maxlength="160"></label>
+        <div class="field-row">
+          <label>Tipo<select name="tipo"><option value="despesa">Despesa</option><option value="receita">Receita</option></select></label>
+          <label>Valor (R$)<input name="valor" inputmode="decimal" required placeholder="1500,00"></label>
+        </div>
+        <label>Vencimento<input type="date" name="vencimento" required></label>
+        <div><button class="primary" type="submit">Adicionar lançamento</button></div>
+      </form>
+    </details>
+  </section>
+</div>
+{% endif %}
+{% endblock %}
