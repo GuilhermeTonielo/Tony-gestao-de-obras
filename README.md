@@ -7,20 +7,49 @@ Projeto escolar de recuperação do 3º C. O painel web reúne obras, etapas, di
 
 ## Como executar no Windows
 
-Na raiz do projeto, use o PowerShell com Python 3.10 ou superior.
+### 1. Prepare o computador
+
+Instale o [Python 3.10 ou superior para Windows](https://www.python.org/downloads/windows/) e abra um novo PowerShell. Confirme a instalação com `py -3 --version`. Se o comando `py` estiver indisponível, confira `python --version` e use `python` no lugar de `py -3` na criação do ambiente virtual.
+
+No GitHub, use **Code → Download ZIP**, extraia o arquivo e abra a pasta extraída no VS Code. Se já usa Git, pode clonar o repositório ou atualizar sua cópia com `git pull`. O terminal deve estar na pasta que contém `README.md`, `backend`, `bd` e `frontend`. Você pode conferir com `Get-ChildItem -Name`.
+
+### 2. Instale as dependências e inicialize o banco
+
+Na primeira execução em cada computador, crie o ambiente virtual nessa máquina. Se você trouxe uma cópia da pasta com `backend/venv` de outro computador, renomeie essa pasta antes de criar o novo ambiente. O ambiente virtual guarda referências ao Python do computador em que foi criado.
 
 ```powershell
-python -m venv backend/venv
+py -3 -m venv backend/venv
 .\backend\venv\Scripts\python.exe -m pip install -r backend/requirements.txt
 .\backend\venv\Scripts\python.exe bd/init_db.py --demo
+```
+
+O inicializador cria `bd/tony.db` com as tabelas e uma construtora fictícia. Em outro computador, a lista começa vazia até que você cadastre uma obra. Anote o `construtora_id` exibido para testar a API. Reexecute o inicializador ao atualizar uma cópia antiga do projeto para criar as tabelas novas e preservar os registros existentes.
+
+### 3. Inicie o Flask e abra o painel
+
+```powershell
 .\backend\venv\Scripts\python.exe backend/app.py
 ```
 
-O inicializador cria `bd/tony.db` e prepara uma construtora fictícia. Anote o `construtora_id` que o terminal mostrar para usar nos exemplos. Reexecutar o inicializador preserva os registros e evita duplicar a construtora de demonstração.
+Deixe esse terminal aberto e acesse [http://127.0.0.1:5000/painel/inicio](http://127.0.0.1:5000/painel/inicio) no mesmo computador. O terminal deve mostrar `Running on http://127.0.0.1:5000`. Para encerrar o servidor, pressione **Ctrl + C** no terminal.
 
-Com o Flask em execução, abra o [painel de obras](http://127.0.0.1:5000/painel). Use a porta indicada no terminal se ela for diferente de `5000`.
+### Se o painel não abrir
 
-Para atualizar um banco criado em uma etapa anterior, execute novamente `bd/init_db.py --demo` antes de iniciar o servidor. O inicializador acrescenta as tabelas dos módulos.
+| O que aparece | Como resolver |
+| --- | --- |
+| `py` ou `python` não é reconhecido | Confira se o Python está instalado e abra um terminal novo. Use o comando que responder com uma versão 3.10 ou superior. |
+| `No Python at ...` ou referência a uma pasta de outro computador | Renomeie o `backend/venv` antigo e refaça o passo 2 com o Python instalado nessa máquina. |
+| `No module named flask` | Reexecute a instalação de dependências do passo 2 usando o mesmo executável que inicia o app. |
+| `unable to open database file` ou `no such table` | Rode o inicializador do passo 2 a partir da pasta raiz e reinicie o Flask. |
+| Conexão recusada | Veja se o terminal ainda está aberto, se há um erro antes da linha `Running on` e se a porta no navegador é a mesma exibida ali. |
+| Porta 5000 ocupada ou `404` servido por outra aplicação nessa porta | Rode o comando abaixo para abrir o TONY em outra porta. |
+| Aparece só um JSON com `status` e `mensagem` | Acrescente `/painel/inicio` ao endereço para abrir a interface. |
+
+```powershell
+.\backend\venv\Scripts\python.exe -m flask --app backend/app.py run --host 127.0.0.1 --port 5085
+```
+
+Com esse comando, abra [http://127.0.0.1:5085/painel/inicio](http://127.0.0.1:5085/painel/inicio). O endereço `127.0.0.1` sempre aponta para o computador que está abrindo o navegador. Para mostrar o sistema remotamente, use um link de demonstração hospedado ou um túnel com acesso restrito e dados fictícios.
 
 ## Fluxo de demonstração
 
