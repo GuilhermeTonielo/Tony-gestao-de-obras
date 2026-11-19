@@ -196,6 +196,8 @@ A coleção [Thunder Client / Postman](docs/tony-etapa-2.postman_collection.json
 | `bd/` | Modelo inicial, tabelas dos módulos, inicializador e [diagrama da Etapa 1](bd/tony-der.drawio) |
 | `frontend/` | Telas do painel em HTML, CSS e JavaScript |
 
+O [DER atualizado](bd/tony-der-atual.drawio) contém as 16 tabelas do banco em três painéis. As imagens para consulta estão em [Identidade e acesso](bd/tony-der-atual-1.png), [Execução e diário](bd/tony-der-atual-2.png) e [Orçamento e alterações](bd/tony-der-atual-3.png).
+
 O painel envia os dados em JSON por meio de `fetch`. O Flask valida os campos e acessa o SQLite. Depois de cadastrar uma obra ou recarregar o painel, o JavaScript busca a lista atualizada pela API.
 
 Para conferir o fluxo entre perfis, execute `.\backend\venv\Scripts\python.exe -m unittest discover -s backend -v`. Os testes usam um SQLite temporário.

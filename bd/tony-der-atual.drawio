@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Identidade e acesso" id="tony-der-1">
+    <mxGraphModel page="1" pageWidth="1460" pageHeight="1540" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e1" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="contas" target="construtoras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e2" value="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="contas" target="usuarios">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e3" value="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="fotos_perfil" target="contas">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e4" value="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="participantes_obra" target="usuarios">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e5" value="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="participantes_obra" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e6" value="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="acessos_revogados" target="participantes_obra">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e7" value="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="obras" target="construtoras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="usuarios" value="&lt;b&gt;usuarios&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;email  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="125" width="380" height="124" />
+        </mxCell>
+        <mxCell id="contas" value="&lt;b&gt;contas&lt;/b&gt;&lt;hr&gt;PK FK usuario_id  INTEGER&lt;br&gt;senha_hash  TEXT&lt;br&gt;perfil  TEXT&lt;br&gt;FK construtora_id  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="125" width="380" height="149" />
+        </mxCell>
+        <mxCell id="fotos_perfil" value="&lt;b&gt;fotos_perfil&lt;/b&gt;&lt;hr&gt;PK FK usuario_id  INTEGER&lt;br&gt;tipo  TEXT&lt;br&gt;conteudo  BLOB" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="125" width="380" height="124" />
+        </mxCell>
+        <mxCell id="participantes_obra" value="&lt;b&gt;participantes_obra&lt;/b&gt;&lt;hr&gt;PK FK obra_id  INTEGER&lt;br&gt;PK FK usuario_id  INTEGER&lt;br&gt;PK perfil  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="625" width="380" height="124" />
+        </mxCell>
+        <mxCell id="construtoras" value="&lt;b&gt;construtoras&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;nome  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="440" width="380" height="99" />
+        </mxCell>
+        <mxCell id="acessos_revogados" value="&lt;b&gt;acessos_revogados&lt;/b&gt;&lt;hr&gt;PK FK obra_id  INTEGER&lt;br&gt;PK FK usuario_id  INTEGER&lt;br&gt;PK FK perfil  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="755" width="380" height="124" />
+        </mxCell>
+        <mxCell id="obras" value="&lt;b&gt;obras&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK construtora_id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;local  TEXT&lt;br&gt;data_inicio  TEXT&lt;br&gt;previsao_entrega  TEXT&lt;br&gt;status  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="625" width="380" height="224" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Execução e diário" id="tony-der-2">
+    <mxGraphModel page="1" pageWidth="1460" pageHeight="1540" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e1" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="participantes_obra" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e2" value="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="registros_diario" target="participantes_obra">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e3" value="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="etapas" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e4" value="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="fotos_diario" target="registros_diario">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e5" value="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="imagens_diario" target="fotos_diario">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e6" value="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="checklist_diario" target="registros_diario">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="obras" value="&lt;b&gt;obras&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK construtora_id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;local  TEXT&lt;br&gt;data_inicio  TEXT&lt;br&gt;previsao_entrega  TEXT&lt;br&gt;status  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="125" width="380" height="224" />
+        </mxCell>
+        <mxCell id="participantes_obra" value="&lt;b&gt;participantes_obra&lt;/b&gt;&lt;hr&gt;PK FK obra_id  INTEGER&lt;br&gt;PK FK usuario_id  INTEGER&lt;br&gt;PK perfil  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="125" width="380" height="124" />
+        </mxCell>
+        <mxCell id="registros_diario" value="&lt;b&gt;registros_diario&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;FK autor_id  INTEGER&lt;br&gt;FK perfil_autor  TEXT&lt;br&gt;data_registro  TEXT&lt;br&gt;atividades  TEXT&lt;br&gt;equipe  TEXT&lt;br&gt;condicoes  TEXT&lt;br&gt;proxima_atividade  TEXT&lt;br&gt;status  TEXT&lt;br&gt;compartilhado_com_cliente  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="125" width="380" height="324" />
+        </mxCell>
+        <mxCell id="etapas" value="&lt;b&gt;etapas&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;ordem  INTEGER&lt;br&gt;prazo  TEXT&lt;br&gt;progresso  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="665" width="380" height="199" />
+        </mxCell>
+        <mxCell id="fotos_diario" value="&lt;b&gt;fotos_diario&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK registro_id  INTEGER&lt;br&gt;caminho  TEXT&lt;br&gt;legenda  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="665" width="380" height="149" />
+        </mxCell>
+        <mxCell id="imagens_diario" value="&lt;b&gt;imagens_diario&lt;/b&gt;&lt;hr&gt;PK FK foto_id  INTEGER&lt;br&gt;tipo  TEXT&lt;br&gt;conteudo  BLOB" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="780" width="380" height="124" />
+        </mxCell>
+        <mxCell id="checklist_diario" value="&lt;b&gt;checklist_diario&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK registro_id  INTEGER&lt;br&gt;descricao  TEXT&lt;br&gt;concluido  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="580" width="380" height="149" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Orçamento e alterações" id="tony-der-3">
+    <mxGraphModel page="1" pageWidth="1460" pageHeight="1540" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e1" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="orcamentos_itens" target="etapas">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e2" value="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="orcamentos_itens" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e3" value="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="lancamentos" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e4" value="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="etapas" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e5" value="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="alteracoes_obra" target="obras">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e6" value="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="decisoes_obra" target="usuarios">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="e7" value="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=open;startArrow=none;fontSize=14;strokeColor=#a4b8b0;" edge="1" parent="1" source="decisoes_obra" target="alteracoes_obra">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="obras" value="&lt;b&gt;obras&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK construtora_id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;local  TEXT&lt;br&gt;data_inicio  TEXT&lt;br&gt;previsao_entrega  TEXT&lt;br&gt;status  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="125" width="380" height="224" />
+        </mxCell>
+        <mxCell id="orcamentos_itens" value="&lt;b&gt;orcamentos_itens&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;FK etapa_id  INTEGER&lt;br&gt;descricao  TEXT&lt;br&gt;valor_centavos  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="125" width="380" height="174" />
+        </mxCell>
+        <mxCell id="lancamentos" value="&lt;b&gt;lancamentos&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;descricao  TEXT&lt;br&gt;tipo  TEXT&lt;br&gt;valor_centavos  INTEGER&lt;br&gt;vencimento  TEXT&lt;br&gt;liquidado  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="125" width="380" height="224" />
+        </mxCell>
+        <mxCell id="etapas" value="&lt;b&gt;etapas&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;ordem  INTEGER&lt;br&gt;prazo  TEXT&lt;br&gt;progresso  INTEGER" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="640" width="380" height="199" />
+        </mxCell>
+        <mxCell id="alteracoes_obra" value="&lt;b&gt;alteracoes_obra&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK obra_id  INTEGER&lt;br&gt;titulo  TEXT&lt;br&gt;previsto  TEXT&lt;br&gt;proposto  TEXT&lt;br&gt;justificativa  TEXT&lt;br&gt;impacto_centavos  INTEGER&lt;br&gt;impacto_dias  INTEGER&lt;br&gt;status  TEXT&lt;br&gt;criado_em  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="520" y="640" width="380" height="299" />
+        </mxCell>
+        <mxCell id="decisoes_obra" value="&lt;b&gt;decisoes_obra&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;FK alteracao_id  INTEGER&lt;br&gt;FK autor_id  INTEGER&lt;br&gt;acao  TEXT&lt;br&gt;motivo  TEXT&lt;br&gt;criado_em  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="640" width="380" height="199" />
+        </mxCell>
+        <mxCell id="usuarios" value="&lt;b&gt;usuarios&lt;/b&gt;&lt;hr&gt;PK id  INTEGER&lt;br&gt;nome  TEXT&lt;br&gt;email  TEXT" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=12;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#79978a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="980" y="1080" width="380" height="124" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
