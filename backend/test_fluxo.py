@@ -65,6 +65,39 @@ class FluxoObraTest(unittest.TestCase):
         self.assertEqual(resposta.status_code, 201, resposta.get_data(as_text=True))
         return resposta.get_json()["id"], token
 
+    def test_edicao_e_isolamento_do_perfil(self):
+        with closing(sqlite3.connect(self.banco)) as db, db:
+            db.row_factory = sqlite3.Row
+            outro_id = cadastrar_conta(db, "Rui", "rui@exemplo.test", "tony-teste", "cliente")
+        ana = self.entrar("ana@exemplo.test")
+        rui = self.entrar("rui@exemplo.test")
+        token = self.token(ana, "/painel/configuracoes")
+        url = "/painel/conta"
+        foto_url = url + "/foto"
+        self.assertEqual(ana.post(url, data={"nome": "Sem token"}).status_code, 403)
+        self.assertEqual(app.test_client().post(url, data={"nome": "Sem login"}).status_code, 302)
+        html = self.formulario(
+            ana, url, token, nome="Ana Aurora", usuario_id=outro_id,
+            foto=(io.BytesIO(FOTO_PNG), "perfil.png"),
+        )
+        self.assertIn('value="Ana Aurora"', html)
+        self.assertIn(f'src="{foto_url}"', html)
+        foto = ana.get(foto_url)
+        self.assertEqual((foto.mimetype, foto.data), ("image/png", FOTO_PNG))
+        self.assertEqual(foto.headers["Cache-Control"], "private, no-store")
+        self.assertEqual(rui.get(foto_url).status_code, 404)
+        self.assertIn('value="Rui"', rui.get("/painel/configuracoes").get_data(as_text=True))
+        self.assertIn("Selecione uma foto JPEG ou PNG.", self.formulario(
+            ana, url, token, nome="Nome inválido pelo arquivo",
+            foto=(io.BytesIO(b"<svg/>"), "perfil.svg"),
+        ))
+        self.assertIn('value="Ana Aurora"', ana.get("/painel/configuracoes").get_data(as_text=True))
+        self.formulario(ana, url, token, nome="Ana Silva")
+        self.assertEqual(ana.get(foto_url).data, FOTO_PNG)
+        self.formulario(ana, foto_url + "/remover", token)
+        self.assertEqual(ana.get(foto_url).status_code, 404)
+        self.assertIn('value="Ana Silva"', ana.get("/painel/configuracoes").get_data(as_text=True))
+
     def test_validacao_e_isolamento(self):
         sem_login = app.test_client()
         self.assertEqual(sem_login.get("/obras").status_code, 401)
@@ -82,6 +115,37 @@ class FluxoObraTest(unittest.TestCase):
         self.assertEqual(admin.post("/obras", json={**OBRA, "data_inicio": "2026-02-31"}, headers=headers).status_code, 400)
         editada = admin.put(f"/obras/{obra_id}", json={**OBRA, "status": "em_andamento"}, headers=headers)
         self.assertEqual(editada.get_json()["status"], "em_andamento")
+
+    def test_troca_de_conta(self):
+        with closing(sqlite3.connect(self.banco)) as db, db:
+            db.row_factory = sqlite3.Row
+            cadastrar_conta(db, "Bia", "bia@exemplo.test", "tony-teste", "construtora", 2)
+        cliente = self.entrar("ana@exemplo.test")
+        obra_id, token_antigo = self.criar_obra(cliente)
+        pagina = cliente.get("/painel/inicio")
+        self.assertIn("Trocar de conta", pagina.get_data(as_text=True))
+        self.assertEqual(pagina.headers["Cache-Control"], "no-store")
+        self.assertEqual(cliente.post("/painel/sair").status_code, 403)
+        self.assertEqual(cliente.get(f"/obras/{obra_id}").status_code, 200)
+        resposta = cliente.post("/painel/sair", data={"_csrf": token_antigo})
+        self.assertEqual(resposta.status_code, 303)
+        self.assertTrue(resposta.headers["Location"].endswith("/painel/entrar"))
+        self.assertEqual(cliente.get("/obras").status_code, 401)
+        token_novo = self.token(cliente, "/painel/entrar")
+        self.assertNotEqual(token_antigo, token_novo)
+        falhou = cliente.post("/painel/entrar", data={
+            "_csrf": token_novo, "email": "bia@exemplo.test", "senha": "incorreta",
+        })
+        self.assertIn("E-mail ou senha inválidos.", falhou.get_data(as_text=True))
+        self.assertEqual(cliente.get("/obras").status_code, 401)
+        resposta = cliente.post("/painel/entrar", data={
+            "_csrf": token_novo, "email": "bia@exemplo.test", "senha": "tony-teste",
+        })
+        self.assertEqual(resposta.status_code, 303)
+        self.assertEqual([o["id"] for o in cliente.get("/obras").get_json()], [1])
+        self.assertEqual(cliente.get(f"/obras/{obra_id}").status_code, 404)
+        self.assertIn("Bia", cliente.get("/painel/inicio").get_data(as_text=True))
+        self.assertEqual(cliente.post("/obras", json=OBRA, headers={"X-CSRF-Token": token_antigo}).status_code, 403)
 
     def test_etapas_diario_financeiro_e_aprovacao(self):
         admin = self.entrar("ana@exemplo.test")

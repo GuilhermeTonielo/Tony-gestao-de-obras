@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
-{% from 'partes.html' import csrf %}
+{% from 'partes.html' import avatar, csrf %}
 {% set titulo = 'Configurações' %}
 {% set ativo = 'painel.configuracoes' %}
 {% block conteudo %}
-<div class="page-heading"><div><h1>Configurações</h1><p>Conta e acessos às obras.</p></div></div>
+<div class="page-heading"><div><h1>Configurações</h1><p>Aparência, conta e acessos às obras.</p></div></div>
+<section class="card bloco" id="aparencia" aria-labelledby="titulo-aparencia" hidden>
+  <h2 id="titulo-aparencia">Aparência</h2>
+  <p id="descricao-tema">A escolha fica salva neste navegador.</p>
+  <fieldset class="opcoes-tema" aria-describedby="descricao-tema">
+    <legend>Tema</legend>
+    <label><input type="radio" name="tema" value="claro" checked> Claro</label>
+    <label><input type="radio" name="tema" value="escuro"> Escuro</label>
+  </fieldset>
+</section>
 <section class="card bloco">
   <h2>Sua conta</h2>
   {% if g.usuario %}
-    <p>{{ g.usuario.nome }} · {{ perfis[g.usuario.perfil] }} · {{ g.usuario.email }}</p>
-    <form method="post" action="{{ url_for('painel.sair') }}">{{ csrf() }}<div><button class="secondary" type="submit">Sair</button></div></form>
+    <div class="conta-identidade">
+      {{ avatar(g.usuario, iniciais, 'avatar-perfil') }}
+      <div><strong>{{ g.usuario.nome }}</strong><p>{{ perfis[g.usuario.perfil] }} · {{ g.usuario.email }}</p></div>
+    </div>
+    <form class="form-perfil" method="post" enctype="multipart/form-data" action="{{ url_for('painel.atualizar_conta') }}">
+      {{ csrf() }}
+      <label>Nome<input name="nome" required maxlength="120" autocomplete="name" value="{{ g.usuario.nome }}"></label>
+      <label>Foto de perfil<input name="foto" type="file" accept="image/jpeg,image/png" aria-describedby="ajuda-foto"></label>
+      <p id="ajuda-foto">JPEG ou PNG, até 5 MB.</p>
+      <div><button class="primary" type="submit">Salvar perfil</button></div>
+    </form>
+    <div class="acoes-perfil">
+      {% if g.usuario.tem_foto %}
+        <form method="post" action="{{ url_for('painel.remover_foto_perfil') }}">{{ csrf() }}<button class="secondary perigo" type="submit">Remover foto</button></form>
+      {% endif %}
+      <form method="post" action="{{ url_for('painel.sair') }}">{{ csrf() }}<button class="secondary" type="submit">Trocar de conta</button></form>
+    </div>
   {% else %}
-    <p>Ambiente local de demonstração.</p>
+    <p>Entre com sua conta para editar o nome e a foto.</p>
     <div><a class="secondary" href="{{ url_for('painel.entrar') }}">Entrar com uma conta</a></div>
   {% endif %}
 </section>

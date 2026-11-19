@@ -1,4 +1,11 @@
 {% macro csrf() -%}<input type="hidden" name="_csrf" value="{{ csrf_token() }}">{%- endmacro %}
+{% macro avatar(usuario, iniciais, classe='') -%}
+  <span class="avatar {{ classe }}" aria-hidden="true">
+    {% if usuario and usuario.tem_foto %}
+      <img src="{{ url_for('painel.foto_perfil') }}" alt="">
+    {% else %}{{ iniciais }}{% endif %}
+  </span>
+{%- endmacro %}
 {% macro seletor(obras, obra) -%}
   {% if obras %}
     <form method="get" class="seletor-obra">

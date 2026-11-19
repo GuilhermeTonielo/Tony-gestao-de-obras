@@ -25,8 +25,15 @@ def instalar_acesso(app):
         MAX_CONTENT_LENGTH=8 * 1024 * 1024,
     )
     app.before_request(identificar)
+    app.after_request(evitar_cache_da_sessao)
     app.jinja_env.globals.update(csrf_token=csrf_token, perfis=PERFIS)
     app.cli.add_command(criar_administrador)
+
+
+def evitar_cache_da_sessao(resposta):
+    if request.endpoint != "static":
+        resposta.cache_control.no_store = True
+    return resposta
 
 
 def conexao():
@@ -59,7 +66,8 @@ def identificar():
     if "usuario_id" in session:
         with conexao() as db:
             g.usuario = db.execute(
-                """SELECT u.id, u.nome, u.email, c.perfil, c.construtora_id
+                """SELECT u.id, u.nome, u.email, c.perfil, c.construtora_id,
+                          EXISTS (SELECT 1 FROM fotos_perfil f WHERE f.usuario_id=u.id) AS tem_foto
                    FROM usuarios u JOIN contas c ON c.usuario_id=u.id WHERE u.id=?""",
                 (session["usuario_id"],),
             ).fetchone()

@@ -6,6 +6,12 @@ CREATE TABLE IF NOT EXISTS contas (
     CHECK ((perfil = 'construtora') = (construtora_id IS NOT NULL))
 );
 
+CREATE TABLE IF NOT EXISTS fotos_perfil (
+    usuario_id INTEGER PRIMARY KEY REFERENCES contas(usuario_id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL CHECK (tipo IN ('image/jpeg','image/png')),
+    conteudo BLOB NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS imagens_diario (
     foto_id INTEGER PRIMARY KEY REFERENCES fotos_diario(id),
     tipo TEXT NOT NULL CHECK (tipo IN ('image/jpeg','image/png')),

@@ -560,6 +560,52 @@ def configuracoes():
     return render_template("configuracoes.html", obras=obras, membros=membros)
 
 
+@painel.post("/conta")
+def atualizar_conta():
+    if not g.usuario:
+        abort(403)
+    validar_csrf()
+    try:
+        nome = texto("nome", 120)
+        foto = foto_enviada()
+        with conexao() as db:
+            db.execute("UPDATE usuarios SET nome=? WHERE id=?", (nome, g.usuario["id"]))
+            if foto:
+                db.execute(
+                    """INSERT INTO fotos_perfil(usuario_id,tipo,conteudo) VALUES (?,?,?)
+                       ON CONFLICT(usuario_id) DO UPDATE SET tipo=excluded.tipo, conteudo=excluded.conteudo""",
+                    (g.usuario["id"], *foto),
+                )
+        flash("Perfil atualizado.")
+    except ValueError as erro:
+        flash(str(erro), "erro")
+    return retornar("configuracoes")
+
+
+@painel.get("/conta/foto")
+def foto_perfil():
+    if not g.usuario:
+        abort(404)
+    with conexao() as db:
+        foto = db.execute("SELECT tipo,conteudo FROM fotos_perfil WHERE usuario_id=?",
+                          (g.usuario["id"],)).fetchone()
+    if foto is None:
+        abort(404)
+    return Response(foto["conteudo"], mimetype=foto["tipo"],
+                    headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
+
+
+@painel.post("/conta/foto/remover")
+def remover_foto_perfil():
+    if not g.usuario:
+        abort(403)
+    validar_csrf()
+    with conexao() as db:
+        db.execute("DELETE FROM fotos_perfil WHERE usuario_id=?", (g.usuario["id"],))
+    flash("Foto removida.")
+    return retornar("configuracoes")
+
+
 @painel.post("/obras/<int:obra_id>/equipe/<int:usuario_id>/remover")
 def remover_acesso(obra_id, usuario_id):
     gestao()

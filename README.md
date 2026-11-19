@@ -59,6 +59,8 @@ Com esse comando, abra [http://127.0.0.1:5085/painel/inicio](http://127.0.0.1:50
 4. Em **Aprovações**, solicite uma mudança com impacto no valor e no prazo. Uma aprovação atualiza o orçamento e a previsão de entrega. Um pedido de ajuste registra o motivo.
 5. Volte à **Visão geral** para conferir as etapas abertas e as aprovações pendentes.
 
+Em **Configurações → Aparência**, escolha **Claro** ou **Escuro**. O tema vale para o painel e a tela de login. Cada navegador guarda sua própria escolha.
+
 ## Acessos por perfil
 
 O modo padrão é uma demonstração local sem login, com acesso de gestão e possibilidade de simular a decisão do cliente. Para testar os perfis com autenticação obrigatória, pare o Flask e execute a partir da raiz do projeto. Substitua `1` pelo ID da sua construtora.
@@ -71,6 +73,10 @@ $env:TONY_SECRET_KEY = & .\backend\venv\Scripts\python.exe -c 'import secrets; p
 ```
 
 Use o e-mail e a senha informados no comando para entrar. Em **Configurações**, crie ou vincule contas de mestre de obras e cliente à obra escolhida. Use janelas separadas do navegador para conferir os perfis.
+
+Depois de entrar, use **Configurações → Sua conta** para alterar seu nome e adicionar, trocar ou remover sua foto. O painel aceita JPEG e PNG de até 5 MB. A foto fica no SQLite e o menu usa as iniciais quando a conta está sem foto.
+
+Use **Trocar de conta** no menu lateral, no cabeçalho do celular ou em **Configurações → Sua conta**. O botão encerra a sessão atual e abre o login. Após entrar novamente, o painel carrega os acessos da conta escolhida. O tema permanece salvo no navegador.
 
 | Perfil | Acesso |
 | --- | --- |

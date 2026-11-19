@@ -1,3 +1,4 @@
+{% from 'partes.html' import avatar %}
 {% macro icon(name, size=20) -%}
   <img src="{{ url_for('static', filename=name ~ '.svg') }}" width="{{ size }}" height="{{ size }}" alt="">
 {%- endmacro %}
@@ -18,6 +19,7 @@
   <meta name="theme-color" content="#faf9f6">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ titulo | default('Visão geral') }} · TONY Gestão de Obras</title>
+  <script src="{{ url_for('static', filename='tema.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='obras.css') }}">
   {% block scripts %}{% endblock %}
 </head>
@@ -37,12 +39,30 @@
       <p class="eyebrow">Espaço de trabalho</p>
       <a class="nav-item{% if ativo == 'painel.configuracoes' %} active{% endif %}" href="{{ url_for('painel.configuracoes') }}"
          {% if ativo == 'painel.configuracoes' %}aria-current="page"{% endif %}>{{ icon('settings') }}Configurações</a>
-      <div class="profile"><span class="avatar">{{ iniciais }}</span><div><strong>{{ nome_usuario }}</strong><small>{{ perfis[g.usuario.perfil] if g.usuario else 'Demonstração' }}</small></div></div>
+      <div class="profile">{{ avatar(g.usuario, iniciais) }}<div><strong>{{ nome_usuario }}</strong><small>{{ perfis[g.usuario.perfil] if g.usuario else 'Demonstração' }}</small></div></div>
+      {% if g.usuario %}
+        <form class="trocar-conta" method="post" action="{{ url_for('painel.sair') }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button class="secondary" type="submit">Trocar de conta</button>
+        </form>
+      {% else %}
+        <a class="secondary acesso-conta" href="{{ url_for('painel.entrar') }}">Entrar com uma conta</a>
+      {% endif %}
     </div>
   </aside>
   <header class="mobile-header">
     <a href="{{ url_for('painel.inicio') }}" class="brand" aria-label="TONY Gestão de Obras">{{ icon('brand-mobile', 24) }} <span>TONY</span></a>
-    <a class="avatar" href="{{ url_for('painel.configuracoes') }}" aria-label="Configurações">{{ iniciais }}</a>
+    <div class="header-tools">
+      <a href="{{ url_for('painel.configuracoes') }}" aria-label="Configurações">{{ avatar(g.usuario, iniciais) }}</a>
+      {% if g.usuario %}
+        <form method="post" action="{{ url_for('painel.sair') }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+          <button class="secondary" type="submit">Trocar de conta</button>
+        </form>
+      {% else %}
+        <a class="secondary" href="{{ url_for('painel.entrar') }}">Entrar</a>
+      {% endif %}
+    </div>
   </header>
   <main class="main" id="conteudo">
     <div class="desktop-header">
